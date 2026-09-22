@@ -4,7 +4,7 @@ import { createClient } from '@libsql/client';
 
 
 const client = createClient({
-  url: process.env.TURSO_DATABASE_URL,
+  url: process.env.TURSO_DATABASE_URL?.toString() ?? "",
   authToken: process.env.TURSO_AUTH_TOKEN
 });
 
