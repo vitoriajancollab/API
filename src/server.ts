@@ -21,16 +21,16 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const config = {
-    user: "sa",
-    password: "M@r10@1979",//"vivimaps",
-    server: "localhost",
-    database: "CemiterioMap",
-    options: {
-        encrypt: false,
-        trustServerCertificate: true
-    }
-};
+// const config = {
+//     user: "sa",
+//     password: "M@r10@1979",//"vivimaps",
+//     server: "localhost",
+//     database: "CemiterioMap",
+//     options: {
+//         encrypt: false,
+//         trustServerCertificate: true
+//     }
+// };
 
 app.get("/", (req, res) => {
     res.send("API CemiterioMap funcionando!");
