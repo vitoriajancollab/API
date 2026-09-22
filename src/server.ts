@@ -4,8 +4,8 @@ import { createClient } from '@libsql/client';
 
 
 const client = createClient({
-  url: process.env.TURSO_DATABASE_URL?.toString() ?? "",
-  authToken: process.env.TURSO_AUTH_TOKEN
+  url: "libsql://database-gray-magnet-vercel-icfg-i38iq5kqb4k38moinnsuqptu.aws-us-east-1.turso.io",
+  authToken: "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3OTAwNDEwNDIsImlkIjoiMDFhMGM2YzItYWIwMS03YTE0LTk5MjQtOTVkM2IzMjRjYWJlIiwia2lkIjoiczcxXzlfVXhDaDVBWk9MbkUtNEV3ZllsdlFiNi1qU2t4bWUzbHBQbWNjTSIsInJpZCI6IjY0NTU4NGQzLTIzODItNGY3My05OGMzLWU3MTNiNWQ0ZTA3NiJ9.lob2Oh-GBMLjOtjw2Sprjr6lDBY1aOHzbxAaXcD8LcXkvsYUpSYsIPVdicXpau2BWKTp0xoJdobzdrLwSJN_DQ"
 });
 
 export const POST = async () => {
