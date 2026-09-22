@@ -1,7 +1,19 @@
 import express from "express";
 
+import { createClient } from '@libsql/client';
+import { NextResponse } from 'next/server';
+
+const client = createClient({
+  url: process.env.TURSO_DATABASE_URL,
+  authToken: process.env.TURSO_AUTH_TOKEN
+});
+
+export const POST = async () => {
+  // Fetch data from clientite
+  const result = await client.execute("CREATE TABLE todos (description);");
+};
 const cors = require("cors");
-const sql = require("mssql");
+//const client = require("msclient");
 
 
 const app = express();
@@ -28,30 +40,30 @@ app.get("/falecidos", async (req, res) => {
     try {
         const { nome } = req.query;
 
-        const pool = await sql.connect(config);
+        //const pool = await client.connect(config);
 
-        const request = pool.request();
+        const request = client;
 
         let resultado;
 
         if (nome) {
-            request.input("nome", sql.VarChar, `%${nome}%`);
+            
 
-            resultado = await request.query(`
+            resultado = await request.execute(`
                 SELECT *
                 FROM Falecidos
-                WHERE Nome LIKE @nome
+                WHERE Nome LIKE ?
                 ORDER BY Nome
-            `);
+            `, [`%${nome}%`]);
         } else {
-            resultado = await request.query(`
+            resultado = await request.execute(`
                 SELECT *
                 FROM Falecidos
                 ORDER BY Nome
             `);
         }
 
-        res.json(resultado.recordset);
+        res.json(resultado.rows);
     } catch (erro: any) {
         console.error("Erro ao buscar falecidos:", erro);
 
@@ -93,7 +105,9 @@ app.post("/falecidos", async (req, res) => {
 
         const nascimento = converterData(DataNascimento);
         const falecimento = converterData(DataFalecimento);
-        let pool: any = await sql.connect(config); if (!Nome) {
+        //let pool: any = await sql.connect(config); 
+        
+        if (!Nome) {
             return res.status(400).json({
                 erro: "O nome do falecido é obrigatório."
             });
@@ -101,18 +115,9 @@ app.post("/falecidos", async (req, res) => {
 
 
 
-       pool = await sql.connect(config);
+       //pool = await sql.connect(config);
 
-        const resultado = await pool.request()
-            .input("Nome", sql.VarChar, Nome)
-            .input("DataNascimento", sql.Date, nascimento)
-            .input("DataFalecimento", sql.Date, falecimento)
-            .input("Cemiterio", sql.VarChar, Cemiterio || null)
-            .input("Quadra", sql.VarChar, Quadra || null)
-            .input("Lote", sql.VarChar, Lote || null)
-            .input("Latitude", sql.Decimal(10, 7), Latitude || null)
-            .input("Longitude", sql.Decimal(10, 7), Longitude || null)
-            .query(`
+        const resultado = await client.execute(`
                 INSERT INTO Falecidos
                 (
                     Nome,
@@ -127,18 +132,18 @@ app.post("/falecidos", async (req, res) => {
                 OUTPUT INSERTED.*
                 VALUES
                 (
-                    @Nome,
-                    @DataNascimento,
-                    @DataFalecimento,
-                    @Cemiterio,
-                    @Quadra,
-                    @Lote,
-                    @Latitude,
-                    @Longitude
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ? 
                 )
-`);
+`, [Nome, nascimento, falecimento, Cemiterio, Quadra, Lote, Latitude, Longitude]);
 
-        res.status(201).json(resultado.recordset[0]);
+        res.status(201).json(resultado.rows[0]);
 
     } catch (erro: any) {
         console.error("Erro ao cadastrar falecido:", erro);
@@ -175,35 +180,25 @@ app.put("/falecidos/:id", async (req, res) => {
             });
         }
 
-        const pool = await sql.connect(config);
-
-        const resultado = await pool.request()
-            .input("Id", sql.Int, id)
-            .input("Nome", sql.VarChar, Nome)
-            .input("DataNascimento", sql.Date, DataNascimento || null)
-            .input("DataFalecimento", sql.Date, DataFalecimento || null)
-            .input("Cemiterio", sql.VarChar, Cemiterio || null)
-            .input("Quadra", sql.VarChar, Quadra || null)
-            .input("Lote", sql.VarChar, Lote || null)
-            .input("Latitude", sql.Decimal(10, 7), Latitude || null)
-            .input("Longitude", sql.Decimal(10, 7), Longitude || null)
-            .query(`
+        //const pool = await sql.connect(config);
+        
+        const resultado = await client.execute(`
                 UPDATE Falecidos
                 SET
-                    Nome = @Nome,
-                    DataNascimento = @DataNascimento,
-                    DataFalecimento = @DataFalecimento,
-                    Cemiterio = @Cemiterio,
-                    Quadra = @Quadra,
-                    Lote = @Lote,
-                    Latitude = @Latitude,
-                    Longitude = @Longitude
+                    Nome = ?,
+                    DataNascimento = ?,
+                    DataFalecimento = ?,
+                    Cemiterio = ?,
+                    Quadra = ?,
+                    Lote = ?,
+                    Latitude = ?,
+                    Longitude = ?
                 OUTPUT INSERTED.*
-                WHERE Id = @Id
-            `);
+                WHERE Id = ?
+            `, [Nome, DataNascimento, DataFalecimento, Cemiterio, Quadra, Lote, Latitude, Longitude, id]);
 
 
-        res.json(resultado.recordset[0]);
+        res.json(resultado.rows[0]);
 
     } catch (erro) {
         console.error("Erro ao atualizar falecido:", erro);
@@ -224,13 +219,13 @@ app.delete("/falecidos/:id", async (req, res) => {
     try {
         const id = parseInt(req.params.id);
 
-        const pool = await sql.connect(config);
+        //const pool = await sql.connect(config);
 
-        const resultado = await pool.request()
-            .input("Id", sql.Int, id)
-            .query("DELETE FROM Falecidos WHERE Id = @Id");
+        const resultado = await client.execute(`
+            DELETE FROM Falecidos WHERE Id = ?
+        `, [id]);
 
-        if (resultado.rowsAffected[0] === 0) {
+        if (resultado.rows.length === 0) {
             return res.status(404).json({
                 erro: "Falecido não encontrado."
             });
