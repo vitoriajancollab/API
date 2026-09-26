@@ -17,6 +17,13 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// API não deve ser cacheada, evita respostas 304 com dados desatualizados
+app.disable("etag");
+app.use((req, res, next) => {
+    res.set("Cache-Control", "no-store");
+    next();
+});
+
 // const config = {
 //     user: "sa",
 //     password: "M@r10@1979",//"vivimaps",
@@ -239,9 +246,14 @@ app.delete("/falecidos/:id", async (req, res) => {
         });
     }
 });
-const port = Number(process.env.PORT) || 3000;
+// Na Vercel o app roda como Serverless Function (ver api/index.ts), não via listen
+if (!process.env.VERCEL) {
+    const port = Number(process.env.PORT) || 3000;
 
-app.listen(port, "0.0.0.0", () => {
-    console.log(`Servidor rodando na porta ${port}`);
-});
+    app.listen(port, "0.0.0.0", () => {
+        console.log(`Servidor rodando na porta ${port}`);
+    });
+}
+
+export default app;
 
