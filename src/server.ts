@@ -90,24 +90,8 @@ app.post("/falecidos", async (req, res) => {
         } = req.body;
         console.log("Dados recebidos:", req.body);
 
-        function converterData(data: any) {
-            if (!data) return null;
-
-            const partes = data.split("/");
-
-            if (partes.length === 3) {
-                return new Date(
-                    Number(partes[2]),
-                    Number(partes[1]) - 1,
-                    Number(partes[0])
-                );
-            }
-
-            return new Date(data);
-        }
-
-        const nascimento = converterData(DataNascimento);
-        const falecimento = converterData(DataFalecimento);
+        const nascimento = DataNascimento || null;
+        const falecimento = DataFalecimento || null;
         //let pool: any = await sql.connect(config); 
         
         if (!Nome) {
