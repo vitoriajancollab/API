@@ -148,7 +148,13 @@ app.put("/teste", (req, res) => {
 
 app.put("/falecidos/:id", async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = Number(req.params.id);
+
+        if (!Number.isInteger(id)) {
+            return res.status(400).json({
+                erro: "O ID do falecido deve ser um número inteiro."
+            });
+        }
 
         const {
             Nome,
@@ -184,6 +190,11 @@ app.put("/falecidos/:id", async (req, res) => {
                 RETURNING *
             `, [Nome, DataNascimento, DataFalecimento, Cemiterio, Quadra, Lote, Latitude, Longitude, id]);
 
+        if (resultado.rows.length === 0) {
+            return res.status(404).json({
+                erro: "Falecido não encontrado."
+            });
+        }
 
         res.json(resultado.rows[0]);
 
@@ -209,7 +220,7 @@ app.delete("/falecidos/:id", async (req, res) => {
         //const pool = await sql.connect(config);
 
         const resultado = await client.execute(`
-            DELETE FROM Falecidos WHERE Id = ?
+            DELETE FROM Falecidos WHERE Id = ? RETURNING Id
         `, [id]);
 
         if (resultado.rows.length === 0) {
