@@ -8,10 +8,6 @@ const client = createClient({
   authToken: "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3OTAwNDEwNDIsImlkIjoiMDFhMGM2YzItYWIwMS03YTE0LTk5MjQtOTVkM2IzMjRjYWJlIiwia2lkIjoiczcxXzlfVXhDaDVBWk9MbkUtNEV3ZllsdlFiNi1qU2t4bWUzbHBQbWNjTSIsInJpZCI6IjY0NTU4NGQzLTIzODItNGY3My05OGMzLWU3MTNiNWQ0ZTA3NiJ9.lob2Oh-GBMLjOtjw2Sprjr6lDBY1aOHzbxAaXcD8LcXkvsYUpSYsIPVdicXpau2BWKTp0xoJdobzdrLwSJN_DQ"
 });
 
-export const POST = async () => {
-  // Fetch data from clientite
-  const result = await client.execute("CREATE TABLE todos (description);");
-};
 const cors = require("cors");
 //const client = require("msclient");
 
