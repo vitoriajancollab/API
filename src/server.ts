@@ -125,7 +125,6 @@ app.post("/falecidos", async (req, res) => {
                     Latitude,
                     Longitude
                 )
-                OUTPUT INSERTED.*
                 VALUES
                 (
                     ?,
@@ -137,6 +136,7 @@ app.post("/falecidos", async (req, res) => {
                     ?,
                     ? 
                 )
+                RETURNING *
 `, [Nome, nascimento, falecimento, Cemiterio, Quadra, Lote, Latitude, Longitude]);
 
         res.status(201).json(resultado.rows[0]);
@@ -189,8 +189,8 @@ app.put("/falecidos/:id", async (req, res) => {
                     Lote = ?,
                     Latitude = ?,
                     Longitude = ?
-                OUTPUT INSERTED.*
                 WHERE Id = ?
+                RETURNING *
             `, [Nome, DataNascimento, DataFalecimento, Cemiterio, Quadra, Lote, Latitude, Longitude, id]);
 
 
@@ -239,7 +239,9 @@ app.delete("/falecidos/:id", async (req, res) => {
         });
     }
 });
-app.listen(3000, () => {
-    console.log("Servidor rodando na porta 3000");
+const port = Number(process.env.PORT) || 3000;
+
+app.listen(port, "0.0.0.0", () => {
+    console.log(`Servidor rodando na porta ${port}`);
 });
 
